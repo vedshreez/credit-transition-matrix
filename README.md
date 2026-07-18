@@ -2,8 +2,6 @@
 
 A cohort-method Markov chain model of corporate bond rating migration, benchmarked against Moody's and S&P's own published transition studies, with macro stress-testing to compare baseline vs. recession-era downgrade and default behavior.
 
-FIM 601 | NC State University | Vedashree Teli
-
 ---
 
 ## Introduction
