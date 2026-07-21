@@ -62,6 +62,20 @@ Note: row sums land in the 98–102% range rather than exactly 100%, because eac
 3. **Macro stress-testing** — splitting the historical sample into recession vs. expansion periods (via NBER recession dates or a GDP-growth threshold) to produce baseline vs. stressed transition matrices.
 4. **Validation** — comparing any independently reconstructed matrix against these published agency benchmarks, and investigating any material divergence rather than treating agreement as automatic.
 
+## Status
+
+✅ Complete — see `notes/validation_writeup.md` for full findings.
+
+Built a discrete-time Markov chain model of corporate rating migration, validated two ways:
+1. Tested whether a 1-year transition matrix, cubed, predicts the actual published 3-year
+   matrix (time-homogeneity check) — holds well for investment-grade, breaks down for
+   speculative-grade.
+2. Compared a calm-period baseline (2024-2025) against a real historical stress period
+   (COVID recession, 2019-2020) — speculative-grade default probabilities rise 2-3x under
+   stress, while investment-grade shows 0% default in both periods.
+
+Both agencies (Moody's and S&P) were used for cross-validation.
+
 ## References
 
 - Jarrow, R. A., Lando, D., & Turnbull, S. M. (1997). *A Markov Model for the Term Structure of Credit Risk Spreads.* Review of Financial Studies, 10(2), 481–523.
