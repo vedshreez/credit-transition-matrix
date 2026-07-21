@@ -21,7 +21,7 @@ Despite that, very few student-level projects touch credit migration modeling di
 1. **Sources real transition data** directly from both major rating agencies' SEC filings (not third-party estimates) — Moody's and S&P are legally required to publish 1-year, 3-year, and 10-year transition and default rate matrices annually as Exhibit 1 to their Form NRSRO filing on SEC EDGAR.
 2. **Extracts those matrices cleanly** from the source PDFs using position-aware table parsing, preserving every cell (including implicit zeros) rather than relying on flattened text.
 3. **Validates the matrices structurally** — confirming each row of probabilities sums to ~100%, and cross-checking Moody's vs. S&P behavior at equivalent rating levels.
-4. **(Next phase) Applies macro stress-testing** — splitting the historical sample into recession vs. expansion periods to produce a baseline-vs-stressed comparison of downgrade and default rates by rating category, in the style used in bank CCAR/DFAST submissions.
+4. **Applies macro stress-testing** — compares a calm-period baseline (2024-2025) against a real historical stress period (COVID recession, 2019-2020) to produce a baseline-vs-stressed comparison of downgrade and default rates by rating category, in the style used in bank CCAR/DFAST submissions.
 
 ## Data
 
@@ -55,12 +55,37 @@ Note: row sums land in the 98–102% range rather than exactly 100%, because eac
 |---|---|
 | `extract_matrices.py` | Extracts the Corporate Issuers transition/default tables from both agencies' raw Exhibit 1 PDFs into the clean CSVs in `data/`, using `pdfplumber` for position-aligned table parsing (so blank/implicit-zero cells are read correctly rather than dropped, which is a common failure mode of naive text extraction from these filings). |
 
-## Methodology (in progress)
+## Methodology
 
-1. **Cohort-method construction** — for each starting rating, count how many issuers migrated to each other rating (or defaulted) over a fixed horizon, divide by the starting count to get transition probabilities. This is the exact method Moody's and S&P themselves describe using in their own filings.
-2. **Multi-year transitions via matrix power** — the n-year transition matrix is the one-year matrix raised to the n-th power, under a time-homogeneity assumption that will be tested rather than simply assumed.
-3. **Macro stress-testing** — splitting the historical sample into recession vs. expansion periods (via NBER recession dates or a GDP-growth threshold) to produce baseline vs. stressed transition matrices.
-4. **Validation** — comparing any independently reconstructed matrix against these published agency benchmarks, and investigating any material divergence rather than treating agreement as automatic.
+1. **Cohort-method construction** — for each starting rating, count how many issuers migrated
+   to each other rating (or defaulted) over a fixed horizon, divide by the starting count to
+   get transition probabilities. This is the exact method Moody's and S&P themselves describe
+   using in their own filings.
+2. **Multi-year transitions via matrix power** — the n-year transition matrix is the one-year
+   matrix raised to the n-th power, under a time-homogeneity assumption. This was tested
+   directly: cubing each agency's 1-year matrix and comparing it against their own published
+   3-year matrix (see figures below).
+3. **Macro stress-testing** — compared the current baseline matrix against Moody's own
+   historical filing covering the COVID recession period (Dec 2019-Dec 2020) to produce a
+   real baseline-vs-stressed comparison, rather than an arbitrary regime split.
+4. **Validation** — compared the reconstructed matrices against these published agency
+   benchmarks, investigating material divergence rather than treating agreement as automatic.
+
+## Results
+
+### Time-homogeneity test: 1-year matrix cubed vs. actual 3-year matrix
+
+**Moody's**
+![Moody's 1yr cubed vs 3yr actual](output/moodys_1y_cubed_vs_3y_actual.png)
+
+**S&P**
+![S&P 1yr cubed vs 3yr actual](output/sp_1y_cubed_vs_3y_actual.png)
+
+### Macro stress test: baseline vs. COVID recession
+
+![Baseline vs stressed transition matrix](output/baseline_vs_stressed_heatmap.png)
+
+Full findings and interpretation in `notes/validation_writeup.md`.
 
 ## Status
 
